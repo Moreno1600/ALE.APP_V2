@@ -1,0 +1,6 @@
+{
+  "name": "ALE | Accounting Logic Engine",
+  "description": "GAAP Compliant real-time accounting logic engine with financial statements and CFO AI assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

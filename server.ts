@@ -11,9 +11,9 @@ async function startServer() {
 
   app.post('/api/chat', async (req, res) => {
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : undefined;
       if (!apiKey) {
-        return res.status(500).json({ error: 'GEMINI_API_KEY is not configured. Please add it in the AI Studio Settings menu.' });
+        return res.status(500).json({ error: 'GEMINI_API_KEY is not configured or is empty. Please set GEMINI_API_KEY in the AI Studio Settings / Environment Variables.' });
       }
       
       const { query, financials } = req.body;
@@ -43,7 +43,7 @@ Explain the 'Why' behind the numbers. Do NOT use LaTeX formatting.
     } catch (error: any) {
       let errorMsg = error.message || 'Unknown error';
       if (errorMsg.includes('API key not valid') || errorMsg.includes('API_KEY_INVALID') || (error as any).status === 400) {
-        errorMsg = 'Invalid Gemini API Key. Please update your GEMINI_API_KEY in the AI Studio Settings menu.';
+        errorMsg = 'Invalid Gemini API Key. Please verify your GEMINI_API_KEY in the AI Studio Settings menu.';
       } else {
         console.error("AI Error:", error);
       }
