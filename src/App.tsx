@@ -19,7 +19,36 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const [ledger, setLedger] = useState<Transaction[]>([]);
+  // Initialize with balanced enterprise sample case study so showcase viewers see live data immediately
+  const [ledger, setLedger] = useState<Transaction[]>(() => {
+    const sampleEvents: [string, number][] = [
+      ["Issue common stock", 100000],
+      ["Purchase equipment", 25000],
+      ["Purchase inventory on account", 30000],
+      ["Sold inventory on account", 45000],
+      ["Pay wages", 12000],
+      ["Record depreciation", 2500],
+      ["Collected cash in advance", 8000],
+      ["Pay prepaid", 4000],
+      ["Record bad debt estimate", 1500]
+    ];
+
+    const generated: Transaction[] = [];
+    sampleEvents.forEach(([desc, amt]) => {
+      const { entries, logicNote } = analyzeTransaction(desc, amt);
+      entries.forEach(([dr, cr, val]) => {
+        generated.push({
+          Event: desc,
+          Debit: dr,
+          Credit: cr,
+          Amount: val,
+          Logic: logicNote
+        });
+      });
+    });
+
+    return generated;
+  });
   const [activeTab, setActiveTab] = useState('DASHBOARD');
 
   const financials = generateFinancials(ledger);
