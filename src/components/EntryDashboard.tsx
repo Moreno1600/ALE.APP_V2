@@ -87,16 +87,17 @@ interface Props {
 
 export default function EntryDashboard({ ledger, setLedger }: Props) {
   const [selectedDesc, setSelectedDesc] = useState("Performed services for cash");
-  const [amount, setAmount] = useState<number>(10000);
+  const [amountStr, setAmountStr] = useState<string>("10000");
   const [successNote, setSuccessNote] = useState<string | null>(null);
 
-  const preview = amount > 0 ? analyzeTransaction(selectedDesc, amount) : { entries: [], logicNote: "" };
+  const numericAmount = parseFloat(amountStr) || 0;
+  const preview = numericAmount > 0 ? analyzeTransaction(selectedDesc, numericAmount) : { entries: [], logicNote: "" };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (amount <= 0) return;
+    if (numericAmount <= 0) return;
 
-    const { entries, logicNote } = analyzeTransaction(selectedDesc, amount);
+    const { entries, logicNote } = analyzeTransaction(selectedDesc, numericAmount);
     if (!entries.length) return;
 
     const newTransactions = entries.map(([dr, cr, amt]) => ({
@@ -114,10 +115,10 @@ export default function EntryDashboard({ ledger, setLedger }: Props) {
 
   const handleClear = () => {
     setLedger([]);
-    setAmount(10000);
+    setAmountStr("10000");
   };
 
-  const quickAmounts = [2500, 10000, 25000, 50000, 100000];
+  const quickAmounts = [2500, 5000, 10000, 25000, 50000, 100000];
 
   const drAccounts = [...ASSETS, ...EXPENSES, ...CONTRA_LIABS, ...CONTRA_EQUITY];
   const crAccounts = [...LIABILITIES, ...EQUITY, ...REVENUE, ...CONTRA_ASSETS];
@@ -189,11 +190,11 @@ export default function EntryDashboard({ ledger, setLedger }: Props) {
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono font-bold">$</span>
                   <input
                     type="number"
-                    min="1"
-                    step="100"
-                    value={amount || ''}
-                    onChange={e => setAmount(Number(e.target.value))}
-                    placeholder="Enter amount..."
+                    step="any"
+                    min="0"
+                    value={amountStr}
+                    onChange={e => setAmountStr(e.target.value)}
+                    placeholder="Enter any amount (e.g. 500, 2500)..."
                     className="w-full bg-[#090d14] border border-[#26374d] hover:border-[#384f6d] focus:border-[#86bc25] rounded-lg pl-8 pr-4 py-2.5 text-base font-mono font-bold text-white focus:outline-none transition-colors"
                   />
                 </div>
@@ -204,9 +205,9 @@ export default function EntryDashboard({ ledger, setLedger }: Props) {
                     <button
                       key={val}
                       type="button"
-                      onClick={() => setAmount(val)}
+                      onClick={() => setAmountStr(String(val))}
                       className={`text-[11px] font-mono px-2.5 py-1 rounded transition-all cursor-pointer ${
-                        amount === val
+                        numericAmount === val
                           ? 'bg-[#86bc25] text-black font-bold'
                           : 'bg-[#141e2d] hover:bg-[#1a283c] text-slate-300 border border-[#26374d]'
                       }`}
@@ -242,7 +243,7 @@ export default function EntryDashboard({ ledger, setLedger }: Props) {
               {/* Post Button */}
               <button
                 type="submit"
-                disabled={amount <= 0}
+                disabled={numericAmount <= 0}
                 className="w-full bg-[#86bc25] hover:bg-[#77a91f] text-[#090e15] font-bold text-sm py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-[#86bc25]/20 cursor-pointer disabled:opacity-50"
               >
                 <PlusCircle className="w-4 h-4" />
